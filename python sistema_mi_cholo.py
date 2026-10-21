@@ -9,33 +9,40 @@ ARCHIVO_VENTAS = CARPETA / "ventas.csv"
 
 
 # INTEGRANTE 4: Manejo de archivos CSV
+import csv
+import os
+
+
 def cargar_csv(archivo):
-    if not archivo.exists():
+    if not os.path.exists(archivo):
         return []
 
     try:
         with open(archivo, "r", encoding="utf-8", newline="") as f:
             return list(csv.DictReader(f))
-    except (OSError, csv.Error) as error:
+    except (OSError, csv.Error, UnicodeDecodeError) as error:
         print("Error al leer archivo:", error)
         return []
 
 
 def guardar_csv(archivo, datos, columnas):
+    temporal = archivo + ".tmp"
     try:
-        with open(archivo, "w", encoding="utf-8", newline="") as f:
+        with open(temporal, "w", encoding="utf-8", newline="") as f:
             escritor = csv.DictWriter(f, fieldnames=columnas)
             escritor.writeheader()
             escritor.writerows(datos)
+        os.replace(temporal, archivo)  # reemplaza el original solo si todo salió bien
         return True
-    except (OSError, csv.Error) as error:
+    except (OSError, csv.Error, ValueError) as error:
         print("Error al guardar:", error)
+        if os.path.exists(temporal):
+            os.remove(temporal)
         return False
 
 
 productos = cargar_csv(ARCHIVO_PRODUCTOS)
 ventas = cargar_csv(ARCHIVO_VENTAS)
-
 
 # INTEGRANTE 3: Busqueda de productos
 def buscar_producto(codigo):
