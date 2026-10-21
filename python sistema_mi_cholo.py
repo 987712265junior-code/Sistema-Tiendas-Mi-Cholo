@@ -149,16 +149,96 @@ def ordenar_productos():
         print(producto["codigo"], "-", producto["nombre"])
 
 
+
 def mostrar_inventario():
-    for producto in productos:
-        print(producto["codigo"], "-", producto["nombre"],
-              "| Stock:", producto["stock"])
+    if not productos:
+        print("\n===== INVENTARIO =====")
+        print("No hay productos registrados.")
+        return
+
+    print("\n============================== INVENTARIO ==============================")
+    print(f"{'CODIGO':<10} {'PRODUCTO':<25} {'PRECIO':>12} {'STOCK':>8} {'VALOR TOTAL':>15}")
+    print("-" * 74)
+
+    valor_inventario = 0.0
+    unidades_totales = 0
+    productos_stock_bajo = 0
+
+    for producto in sorted(productos, key=lambda p: p["codigo"]):
+        try:
+            precio = float(producto["precio"])
+            stock = int(producto["stock"])
+
+            if precio < 0 or stock < 0:
+                print(f"Datos invalidos para {producto['codigo']}")
+                continue
+
+            valor_producto = precio * stock
+            valor_inventario += valor_producto
+            unidades_totales += stock
+
+            if stock <= 5:
+                productos_stock_bajo += 1
+
+            print(
+                f"{producto['codigo']:<10} "
+                f"{producto['nombre'][:25]:<25} "
+                f"S/ {precio:>8.2f} "
+                f"{stock:>8} "
+                f"S/ {valor_producto:>11.2f}"
+            )
+
+        except (ValueError, KeyError):
+            print(f"Datos invalidos para {producto.get('codigo', 'desconocido')}")
+
+    print("-" * 74)
+    print(f"Unidades totales: {unidades_totales}")
+    print(f"Valor total del inventario: S/ {valor_inventario:.2f}")
+    print(f"Productos con stock bajo (5 o menos): {productos_stock_bajo}")
+
 
 
 # INTEGRANTE 4: Ingresos y menu principal
+
 def mostrar_ingresos():
-    total = sum(float(venta["total"]) for venta in ventas)
-    print("Ingresos acumulados: S/", round(total, 2))
+    print("\n===== REPORTE DE INGRESOS =====")
+
+    if not ventas:
+        print("Todavia no hay ventas registradas.")
+        print("Ingresos acumulados: S/ 0.00")
+        return
+
+    ingresos_totales = 0.0
+    ventas_validas = 0
+    registros_invalidos = 0
+
+    for venta in ventas:
+        try:
+            total = float(venta["total"])
+
+            if total < 0:
+                registros_invalidos += 1
+                continue
+
+            ingresos_totales += total
+            ventas_validas += 1
+
+        except (ValueError, KeyError):
+            registros_invalidos += 1
+
+    promedio = (
+        ingresos_totales / ventas_validas
+        if ventas_validas > 0
+        else 0.0
+    )
+
+    print(f"Ventas registradas correctamente: {ventas_validas}")
+    print(f"Ingresos acumulados: S/ {ingresos_totales:.2f}")
+    print(f"Ingreso promedio por venta: S/ {promedio:.2f}")
+
+    if registros_invalidos > 0:
+        print(f"Registros de venta invalidos: {registros_invalidos}")
+
 
 
 def menu():
