@@ -92,6 +92,8 @@ def registrar_venta():
     if producto is None:
         print("Producto no encontrado")
         return
+    print("Producto seleccionado:", producto["nombre"])
+    print("Precio unitario: S/", producto["precio"])
 
     try:
         cantidad = int(input("Cantidad a vender: "))
