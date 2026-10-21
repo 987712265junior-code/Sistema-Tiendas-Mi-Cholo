@@ -40,9 +40,12 @@ ventas = cargar_csv(ARCHIVO_VENTAS)
 # INTEGRANTE 3: Busqueda de productos
 def buscar_producto(codigo):
     codigo = codigo.strip().upper()
+    
+    if not codigo:
+        return None
 
     for producto in productos:
-        if producto["codigo"] == codigo:
+        if producto["codigo"].strip().upper() == codigo:
             return producto
 
     return None
